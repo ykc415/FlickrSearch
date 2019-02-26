@@ -29,11 +29,9 @@ val appModule = module {
 
     single { RepositoryImpl(get()) as Repository}
 
-
 }
 
 const val TIMEOUT = 20L
-
 
 fun createLoggingInterceptor(): LoggingInterceptor {
 

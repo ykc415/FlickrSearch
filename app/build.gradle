@@ -1,13 +1,16 @@
 apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 
 kapt {
     correctErrorTypes = true
+
+    mapDiagnosticLocations = true
+
+
 }
 
 android {
@@ -67,9 +70,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxkotlin:$rootProject.rx_kotlin_version"
     implementation "com.jakewharton.rxrelay2:rxrelay:$rootProject.rx_relay_version"
 
-
     implementation 'com.airbnb.android:mvrx:0.7.2'
-
 
     // Epoxy
     implementation 'com.airbnb.android:epoxy:3.3.0'
@@ -97,6 +98,32 @@ dependencies {
     implementation "com.facebook.stetho:stetho:$rootProject.stetho_version"
     implementation "com.facebook.stetho:stetho-okhttp3:$rootProject.stetho_version"
 
+
+    // ...
+    // Litho
+    implementation 'com.facebook.litho:litho-core:0.24.1-SNAPSHOT'
+    implementation 'com.facebook.litho:litho-widget:0.24.1-SNAPSHOT'
+
+    kapt 'com.facebook.litho:litho-processor:0.24.1-SNAPSHOT'
+
+    // SoLoader
+    implementation 'com.facebook.soloader:soloader:0.2.0'
+
+    // For integration with Fresco
+    implementation 'com.facebook.litho:litho-fresco:0.24.1-SNAPSHOT'
+
+
+    // Sections
+    implementation 'com.facebook.litho:litho-sections-core:0.24.0'
+    implementation 'com.facebook.litho:litho-sections-widget:0.24.0'
+    compileOnly 'com.facebook.litho:litho-sections-annotations:0.24.0'
+
+    kapt 'com.facebook.litho:litho-sections-processor:0.24.0'
+
+    // For testing
+    testImplementation 'com.facebook.litho:litho-testing:0.24.1-SNAPSHOT'
+    // For testing
+    testImplementation 'com.facebook.litho:litho-testing:0.24.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.2-alpha01'
