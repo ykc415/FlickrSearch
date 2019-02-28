@@ -6,6 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.airbnb.epoxy.EpoxyController
+import com.airbnb.epoxy.EpoxyRecyclerView
 import com.example.flickrsearch.R
 import com.example.flickrsearch.utils.extensions.observe
 import kotlinx.android.synthetic.main.fragment_main.*
@@ -18,11 +21,11 @@ class MainFragment : Fragment() {
 
     val viewModel: MainViewModel by viewModel()
 
-    val controller = EpoxyController()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
+        Log.e(TAG, "OnCreateView $this")
         return inflater.inflate(R.layout.fragment_main, container, false)
     }
 
@@ -31,8 +34,12 @@ class MainFragment : Fragment() {
 
         observeViewModel()
 
-        recyclerView.setController(controller)
 
+        recyclerView.withModels {
+            for (i in 0 until 100) {
+                SimpleKotlinModel(i.toString()).id(i).addTo(this)
+            }
+        }
 
     }
 
@@ -44,46 +51,19 @@ class MainFragment : Fragment() {
             observe(keywords) {
                 Log.e(TAG, it.toString())
 
-                val data = listOf(
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2"),
-                        Sample("1", "2")
-
-                        )
-
-                controller.setData(data)
 
             }
 
         }
     }
 
+
+}
+
+fun EpoxyRecyclerView.withModels(buildModelsCallback: EpoxyController.() -> Unit) {
+    setControllerAndBuildModels(object : EpoxyController() {
+        override fun buildModels() {
+            buildModelsCallback()
+        }
+    })
 }
