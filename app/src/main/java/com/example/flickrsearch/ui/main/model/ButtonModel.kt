@@ -1,18 +1,16 @@
-package com.example.flickrsearch.ui.main
+package com.example.flickrsearch.ui.main.model
 
 import android.view.View
-import androidx.annotation.StringRes
 import androidx.appcompat.widget.AppCompatButton
 import com.airbnb.epoxy.EpoxyAttribute
 import com.airbnb.epoxy.EpoxyHolder
 import com.airbnb.epoxy.EpoxyModelClass
 import com.airbnb.epoxy.EpoxyModelWithHolder
 import com.example.flickrsearch.R
-import com.example.flickrsearch.utils.KotlinModel
 
 
 @EpoxyModelClass(layout = R.layout.button)
-abstract class ButtonModel : EpoxyModelWithHolder<Holder>() {
+abstract class ButtonModel : EpoxyModelWithHolder<ButtonModel.Holder>() {
 
     @EpoxyAttribute
     lateinit var text: String
@@ -25,14 +23,14 @@ abstract class ButtonModel : EpoxyModelWithHolder<Holder>() {
         holder.button.text = text
         holder.button.setOnClickListener(clickListener)
     }
-}
 
-class Holder : EpoxyHolder() {
 
-    lateinit var button: AppCompatButton
+    class Holder : EpoxyHolder() {
 
-    override fun bindView(itemView: View) {
-        button = itemView.findViewById(R.id.btn)
+        lateinit var button: AppCompatButton
+
+        override fun bindView(itemView: View) {
+            button = itemView.findViewById(R.id.btn)
+        }
     }
 }
-

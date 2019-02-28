@@ -21,12 +21,18 @@
     <com.airbnb.epoxy.EpoxyRecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/title"/>
+
+    <com.airbnb.epoxy.EpoxyRecyclerView
+            android:id="@+id/photo_recyclerView"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title"
-            app:layout_constraintBottom_toBottomOf="parent"
-    />
-
+            app:layout_constraintTop_toBottomOf="@+id/recyclerView"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

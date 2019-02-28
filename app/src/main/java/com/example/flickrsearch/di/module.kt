@@ -1,6 +1,5 @@
 package com.example.flickrsearch.di
 
-import androidx.lifecycle.MutableLiveData
 import com.example.flickrsearch.BuildConfig
 import com.example.flickrsearch.BuildConfig.BASE_URL
 import com.example.flickrsearch.data.Repository
@@ -8,17 +7,17 @@ import com.example.flickrsearch.data.RepositoryImpl
 import com.example.flickrsearch.data.remote.FlickrApi
 import com.example.flickrsearch.ui.main.MainViewModel
 import com.facebook.stetho.okhttp3.StethoInterceptor
-import com.ihsanbal.logging.Level
-import com.ihsanbal.logging.LoggingInterceptor
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonParser
 import okhttp3.OkHttpClient
-import okhttp3.internal.platform.Platform
+import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.bind
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 val appModule = module {
@@ -33,16 +32,20 @@ val appModule = module {
 
 const val TIMEOUT = 20L
 
-fun createLoggingInterceptor(): LoggingInterceptor {
+fun createLoggingInterceptor(): HttpLoggingInterceptor {
 
-    return LoggingInterceptor.Builder()
-        .loggable(BuildConfig.DEBUG)
-        .setLevel(Level.BASIC)
-        .log(Platform.INFO)
-        .request("Request")
-        .response("Response")
-        .addHeader("version", BuildConfig.VERSION_NAME)
-        .build()
+    return HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message ->
+        if (message.startsWith("{") || message.startsWith("[")) {
+            val prettyMsg = GsonBuilder().setPrettyPrinting()
+                .create().toJson(JsonParser().parse(message))
+
+            Timber.tag("OKHTTP").d(prettyMsg)
+        } else
+            Timber.tag("OKHTTP").d(message)
+        })
+        .apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
 
 }
 
@@ -52,9 +55,9 @@ fun createOkHttpClient(): OkHttpClient {
         .connectTimeout(TIMEOUT, TimeUnit.SECONDS)
         .readTimeout(TIMEOUT, TimeUnit.SECONDS)
         .writeTimeout(TIMEOUT, TimeUnit.SECONDS)
-        .addNetworkInterceptor(createLoggingInterceptor())
 
     if(BuildConfig.DEBUG) {
+        okHttpClientBuilder.addNetworkInterceptor(createLoggingInterceptor())
         okHttpClientBuilder.addNetworkInterceptor(StethoInterceptor())
     }
 
