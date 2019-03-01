@@ -5,17 +5,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.mvrx.fragmentViewModel
 import com.example.flickrsearch.R
-import com.example.flickrsearch.ui.base.BaseFragment
-import com.example.flickrsearch.ui.base.MvRxEpoxyController
-import com.example.flickrsearch.ui.base.simpleController
-import com.example.flickrsearch.ui.base.views.basicRow
+import com.example.flickrsearch.ui.base.*
 import com.example.flickrsearch.ui.base.views.loadingRow
 import com.example.flickrsearch.ui.base.views.marquee
-import com.example.flickrsearch.utils.extensions.observe
+import com.example.flickrsearch.ui.main.views.MyButtonModel_
+import com.example.flickrsearch.ui.main.views.myPhoto
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_main.*
 
@@ -66,16 +62,26 @@ class MainFragment : BaseFragment() {
 
             marquee {
                 id("marquee")
-                title("Dad Jokes")
+                title(state.currentKeyword)
+            }
+
+            carousel {
+                id("carousel")
+                withModelsFrom(resources.getStringArray(R.array.keywords).toList()) {
+                    MyButtonModel_()
+                        .id(it)
+                        .buttonText(it)
+                        .clickListener { v ->
+                            viewModel.updateCurrentKeyword(it)
+                            viewModel.fetchNextPage()
+                        }
+                }
             }
 
             state.photos.forEachIndexed { index, photo ->
-                basicRow {
+                myPhoto {
                     id(index)
-                    title(photo.title)
-                    clickListener { _ ->
-                        Snackbar.make(this@MainFragment.requireView(), "Hello", Snackbar.LENGTH_INDEFINITE).show()
-                    }
+                    data(photo)
                 }
             }
 
@@ -83,7 +89,7 @@ class MainFragment : BaseFragment() {
                 // Changing the ID will force it to rebind when new data is loaded even if it is
                 // still on screen which will ensure that we trigger loading again.
                 id("loading${state.photos.size}")
-                onBind { _, _, _ -> viewModel.fetchNextPage() }
+                onBind { _, _, _ ->  viewModel.fetchNextPage() }
             }
         }
 

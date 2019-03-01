@@ -1,23 +1,22 @@
 package com.example.flickrsearch.ui.main
 
-import android.content.res.Resources
-import androidx.lifecycle.MutableLiveData
 import com.airbnb.mvrx.*
-import com.example.flickrsearch.R
 import com.example.flickrsearch.data.Repository
 import com.example.flickrsearch.data.dto.FlickrSearchResponse
 import com.example.flickrsearch.ui.base.MvRxViewModel
-import com.example.flickrsearch.ui.main.views.PhotoData
 import com.example.flickrsearch.utils.FlickrUrlParser
 import io.reactivex.schedulers.Schedulers
 import org.koin.android.ext.android.inject
 
-typealias Keywords = List<String>
+const val PHOTO_COUNT = 20
 
-private const val PHOTO_COUNT = 20
+data class PhotoData(
+    val title: String,
+    val url: String
+)
 
 data class MainState(
-    val currentKeyword: String = "apple",
+    val currentKeyword: String = "Apple",
 
     /** We use this request to store the list of all jokes. */
     val photos: List<PhotoData> = emptyList(),
@@ -32,8 +31,7 @@ data class MainState(
  */
 class MainViewModel(
     initialState: MainState,
-    val repository: Repository,
-    val resources: Resources
+    private val repository: Repository
 
 ) : MvRxViewModel<MainState>(initialState) {
 
@@ -48,7 +46,7 @@ class MainViewModel(
 
         override fun create(viewModelContext: ViewModelContext, state: MainState): MainViewModel {
             val service: Repository by viewModelContext.activity.inject()
-            return MainViewModel(state, service, viewModelContext.activity.resources)
+            return MainViewModel(state, service)
         }
     }
 
@@ -71,6 +69,12 @@ class MainViewModel(
                         )
                 } ?: emptyList()))
             }
+    }
+
+    fun updateCurrentKeyword(keyword: String) {
+        setState {
+            MainState(currentKeyword = keyword)
+        }
     }
 
 

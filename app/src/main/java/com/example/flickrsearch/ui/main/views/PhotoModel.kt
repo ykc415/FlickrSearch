@@ -1,46 +1,43 @@
 package com.example.flickrsearch.ui.main.views
 
-import android.view.View
+import android.content.Context
+import android.util.AttributeSet
+import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import com.airbnb.epoxy.EpoxyAttribute
-import com.airbnb.epoxy.EpoxyHolder
-import com.airbnb.epoxy.EpoxyModelClass
-import com.airbnb.epoxy.EpoxyModelWithHolder
+import com.airbnb.epoxy.ModelProp
+import com.airbnb.epoxy.ModelView
 import com.bumptech.glide.Glide
 import com.example.flickrsearch.R
+import com.example.flickrsearch.ui.main.PhotoData
 
 
-@EpoxyModelClass(layout = R.layout.photo)
-abstract class PhotoModel : EpoxyModelWithHolder<PhotoModel.Holder>() {
+@ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
+class MyPhoto @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 
-    @EpoxyAttribute
-    lateinit var viewData: PhotoData
+) : FrameLayout(context, attrs, defStyleAttr) {
 
-    override fun bind(holder: Holder) {
-        holder.title.text = viewData.title
+    val imageView: AppCompatImageView
+    val title: AppCompatTextView
 
-        Glide.with(holder.imageView)
-            .load(viewData.url)
-            .centerCrop()
-            .into(holder.imageView)
+    init {
+        inflate(context, R.layout.photo, this)
+
+        imageView = findViewById(R.id.imageView)
+        title     = findViewById(R.id.title)
     }
 
+    @ModelProp
+    fun setData(data: PhotoData) {
+        title.text = data.title
 
-    class Holder : EpoxyHolder() {
-
-        lateinit var imageView: AppCompatImageView
-        lateinit var title: AppCompatTextView
-
-        override fun bindView(itemView: View) {
-            imageView = itemView.findViewById(R.id.imageView)
-            title     = itemView.findViewById(R.id.title)
-        }
+        Glide.with(imageView)
+            .load(data.url)
+            .centerCrop()
+            .into(imageView)
     }
 
 }
-
-data class PhotoData(
-    val title: String,
-    val url: String
-)

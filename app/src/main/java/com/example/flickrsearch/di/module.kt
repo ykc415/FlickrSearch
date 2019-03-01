@@ -5,14 +5,11 @@ import com.example.flickrsearch.BuildConfig.BASE_URL
 import com.example.flickrsearch.data.Repository
 import com.example.flickrsearch.data.RepositoryImpl
 import com.example.flickrsearch.data.remote.FlickrApiService
-import com.example.flickrsearch.ui.main.MainViewModel
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory

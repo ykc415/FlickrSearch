@@ -9,10 +9,9 @@
             android:layout_height="wrap_content"
             android:paddingLeft="@dimen/padding_horizontal"
             android:paddingRight="@dimen/padding_horizontal"
-            android:paddingTop="48dp"
+            android:paddingTop="20dp"
             android:textColor="@color/text_color"
             android:textSize="32sp"
-            android:textStyle="bold"
             tools:text="Marquee"/>
 
     <TextView
