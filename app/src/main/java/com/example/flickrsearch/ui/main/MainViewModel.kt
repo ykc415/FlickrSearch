@@ -73,7 +73,7 @@ class MainViewModel(
 
     fun updateCurrentKeyword(keyword: String) {
         setState {
-            MainState(currentKeyword = keyword)
+            copy(currentKeyword = keyword)
         }
     }
 

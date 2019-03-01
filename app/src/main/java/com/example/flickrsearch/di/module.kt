@@ -25,7 +25,7 @@ val appModule = module {
 
 }
 
-const val TIMEOUT = 20L
+const val TIMEOUT = 30L
 
 fun createLoggingInterceptor(): HttpLoggingInterceptor {
 
