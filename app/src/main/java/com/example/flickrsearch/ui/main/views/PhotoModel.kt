@@ -1,7 +1,6 @@
-package com.example.flickrsearch.ui.main.model
+package com.example.flickrsearch.ui.main.views
 
 import android.view.View
-import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import com.airbnb.epoxy.EpoxyAttribute

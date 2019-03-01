@@ -1,71 +1,90 @@
 package com.example.flickrsearch.ui.main
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.mvrx.fragmentViewModel
 import com.example.flickrsearch.R
-import com.example.flickrsearch.ui.main.model.ButtonModel_
-import com.example.flickrsearch.ui.main.model.PhotoModel_
+import com.example.flickrsearch.ui.base.BaseFragment
+import com.example.flickrsearch.ui.base.MvRxEpoxyController
+import com.example.flickrsearch.ui.base.simpleController
+import com.example.flickrsearch.ui.base.views.basicRow
+import com.example.flickrsearch.ui.base.views.loadingRow
+import com.example.flickrsearch.ui.base.views.marquee
 import com.example.flickrsearch.utils.extensions.observe
-import com.example.flickrsearch.utils.extensions.withModels
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_main.*
-import org.koin.androidx.viewmodel.ext.viewModel
 
 
-class MainFragment : Fragment() {
+class MainFragment : BaseFragment() {
 
     val TAG = this::class.simpleName
 
-    val viewModel: MainViewModel by viewModel()
+    /**
+     * This will get or create a new ViewModel scoped to this Fragment. It will also automatically
+     * subscribe to all state changes and call [invalidate] which we have wired up to
+     * call [buildModels] in [BaseFragment].
+     */
+    private val viewModel: MainViewModel by fragmentViewModel()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        return inflater.inflate(R.layout.fragment_main, container, false)
+        val view = inflater.inflate(R.layout.fragment_base_mvrx, container, false)
+
+        /**
+         * Use viewModel.subscribe to listen for changes. The parameter is a shouldUpdate
+         * function that is given the old state and new state and returns whether or not to
+         * call the subscriber. onSuccess, onFail, and propertyWhitelist ship with MvRx.
+         */
+        viewModel.asyncSubscribe(MainState::request, onFail = { error ->
+            Snackbar.make(view, "Jokes request failed.", Snackbar.LENGTH_INDEFINITE)
+                .show()
+            Log.w(TAG, "Jokes request failed", error)
+        })
+
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        observeViewModel()
-
-        recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
-
-        photo_recyclerView.setItemSpacingDp(4)
+        recyclerView.setController(epoxyController)
     }
 
+    override fun invalidate() {
+        recyclerView.requestModelBuild()
+    }
 
-    private fun observeViewModel() {
+    override fun epoxyController(): MvRxEpoxyController =
+        simpleController(viewModel) { state ->
 
-        viewModel.run {
-            observe(titleText) { title.text = it }
+            marquee {
+                id("marquee")
+                title("Dad Jokes")
+            }
 
-            observe(keywords) { words ->
-
-                recyclerView.withModels {
-                    words.forEachIndexed { index, s ->
-                        ButtonModel_().id(index).text(s).clickListener { v ->
-                            viewModel.keywordButtonClicked(s)
-                        }.addTo(this)
+            state.photos.forEachIndexed { index, photo ->
+                basicRow {
+                    id(index)
+                    title(photo.title)
+                    clickListener { _ ->
+                        Snackbar.make(this@MainFragment.requireView(), "Hello", Snackbar.LENGTH_INDEFINITE).show()
                     }
                 }
             }
 
-            observe(photos) { datas ->
-                photo_recyclerView.withModels {
-                    datas.forEachIndexed { index, photoData ->
-                        PhotoModel_().id(index).viewData(photoData).addTo(this)
-                    }
-                }
+            loadingRow {
+                // Changing the ID will force it to rebind when new data is loaded even if it is
+                // still on screen which will ensure that we trigger loading again.
+                id("loading${state.photos.size}")
+                onBind { _, _, _ -> viewModel.fetchNextPage() }
             }
         }
-
-    }
-
 
 }

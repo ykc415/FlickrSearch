@@ -4,7 +4,7 @@ import com.example.flickrsearch.BuildConfig
 import com.example.flickrsearch.BuildConfig.BASE_URL
 import com.example.flickrsearch.data.Repository
 import com.example.flickrsearch.data.RepositoryImpl
-import com.example.flickrsearch.data.remote.FlickrApi
+import com.example.flickrsearch.data.remote.FlickrApiService
 import com.example.flickrsearch.ui.main.MainViewModel
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.GsonBuilder
@@ -22,9 +22,7 @@ import java.util.concurrent.TimeUnit
 
 val appModule = module {
 
-    single { createWebService<FlickrApi>(BASE_URL) }
-
-    viewModel { MainViewModel(get(), androidContext().applicationContext.resources) }
+    single { createWebService<FlickrApiService>(BASE_URL) }
 
     single { RepositoryImpl(get()) as Repository}
 

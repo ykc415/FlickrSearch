@@ -14,4 +14,22 @@ class ExampleUnitTest {
     fun addition_isCorrect() {
         assertEquals(4, 2 + 2)
     }
+
+
+    @Test
+    fun test() {
+        val arraylist = mutableListOf<String?>()
+
+        (0 until 100).forEach {
+            arraylist.add("asdf$it")
+        }
+
+        var a = arraylist[0]
+
+        a = null
+
+        print(arraylist[0])
+
+
+    }
 }

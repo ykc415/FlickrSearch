@@ -1,4 +1,4 @@
-package com.example.flickrsearch.ui.main.model
+package com.example.flickrsearch.ui.main.views
 
 import android.view.View
 import androidx.appcompat.widget.AppCompatButton
