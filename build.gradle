@@ -17,6 +17,8 @@ buildscript {
         stetho_version = '1.5.0'
         dexcount_version = '0.8.5'
 
+        mv_rx_version = '0.7.2'
+
     }
 
     repositories {

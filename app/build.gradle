@@ -52,7 +52,22 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    android {
+        sourceSets {
+            String sharedTestDir = 'src/test/java'
+            test {
+                java.srcDir sharedTestDir
+            }
+        }
+    }
 }
+
+
+androidExtensions {
+    experimental = true
+}
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -70,7 +85,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rx_android_version"
     implementation "io.reactivex.rxjava2:rxkotlin:$rootProject.rx_kotlin_version"
     implementation "com.jakewharton.rxrelay2:rxrelay:$rootProject.rx_relay_version"
-    implementation 'com.airbnb.android:mvrx:0.7.2'
+    implementation "com.airbnb.android:mvrx:$rootProject.mv_rx_version"
 
     // Epoxy
     implementation 'com.airbnb.android:epoxy:3.3.0'
@@ -102,6 +117,9 @@ dependencies {
 
 
     testImplementation 'junit:junit:4.12'
+    testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0'
+    testImplementation "com.airbnb.android:mvrx-testing:$rootProject.mv_rx_version"
+
     androidTestImplementation 'androidx.test:runner:1.1.2-alpha01'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.2-alpha01'
 }
