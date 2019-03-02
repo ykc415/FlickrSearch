@@ -18,7 +18,7 @@ data class PhotoData(
 data class MainState(
     val currentKeyword: String = "Apple",
 
-    /** We use this request to store the list of all jokes. */
+    /** We use this request to store the list of all photos. */
     val photos: List<PhotoData> = emptyList(),
 
     /** We use this Async to keep track of the state of the current network request. */
