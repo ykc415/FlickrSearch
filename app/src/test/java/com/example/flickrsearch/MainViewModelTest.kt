@@ -38,28 +38,12 @@ class MainViewModelTest {
 
     private lateinit var viewModel: MainViewModel
 
+    private lateinit var mockResponse: FlickrSearchResponse
 
     @Before
     fun setup() {
 
-    }
-
-    @Test
-    fun fetchNextPage_success() {
-
-        // use subject to be able to verify the loading state before any emissions
-        val photosSubject = SingleSubject.create<FlickrSearchResponse>()
-        whenever(repository.search("test", 0)).thenReturn(photosSubject)
-
-        // given the viewmodel with default state
-        viewModel = MainViewModel(MainState(currentKeyword = "test"), repository)
-
-        // verify that tasks were requested from the repository
-        verify(repository).search("test", 0)
-
-        withState(viewModel) { assertTrue(it.request is Loading) }
-
-        val response = FlickrSearchResponse(
+        mockResponse = FlickrSearchResponse(
             photos = FlickrPhotoPage(
                 page = 0,
                 photo = listOf(
@@ -77,9 +61,25 @@ class MainViewModelTest {
             ),
             stat = "ok"
         )
+    }
+
+    @Test
+    fun fetchNextPage_init_success() {
+
+        // use subject to be able to verify the loading state before any emissions
+        val photosSubject = SingleSubject.create<FlickrSearchResponse>()
+        whenever(repository.search("test", 0)).thenReturn(photosSubject)
+
+        // given the viewmodel with default state
+        viewModel = MainViewModel(MainState(currentKeyword = "test"), repository)
+
+        // verify that tasks were requested from the repository
+        verify(repository).search("test", 0)
+
+        withState(viewModel) { assertTrue(it.request is Loading) }
 
         // new emission from the data source happened
-        photosSubject.onSuccess(response)
+        photosSubject.onSuccess(mockResponse)
 
         // verify that tasks request was successful and the photo list is present
         withState(viewModel) {
@@ -88,7 +88,6 @@ class MainViewModelTest {
         }
 
         // verify that loading state has changed to false after the stream is completed
-
 
     }
 
@@ -109,5 +108,31 @@ class MainViewModelTest {
         }
     }
 
+
+    /**
+     *  다음 페이지 로드 테스트
+     * **/
+    @Test
+    fun fetchNextPage_loadNextPage() {
+
+        val photoSubject = SingleSubject.create<FlickrSearchResponse>()
+        whenever(repository.search("test", 1)).thenReturn(photoSubject)
+
+        viewModel = MainViewModel(
+            MainState(currentKeyword = "test",
+                      photos = listOf(PhotoData("test_title", "test_url"))),
+            repository
+        )
+
+        withState(viewModel) { assertTrue(it.request is Loading) }
+
+        photoSubject.onSuccess(mockResponse)
+
+        withState(viewModel) {
+            assertTrue(it.request is Success)
+            assertTrue(it.photos.size == 2)
+        }
+
+    }
 
 }
