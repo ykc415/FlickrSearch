@@ -3,26 +3,24 @@ package com.example.flickrsearch
 import com.airbnb.mvrx.Fail
 import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.Success
-import com.example.flickrsearch.data.Repository
-import com.example.flickrsearch.ui.main.MainViewModel
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
-import com.nhaarman.mockitokotlin2.verify
-import org.junit.Before
-import org.junit.ClassRule
 import com.airbnb.mvrx.test.MvRxTestRule
 import com.airbnb.mvrx.withState
+import com.example.flickrsearch.data.Repository
 import com.example.flickrsearch.data.dto.FlickrPhoto
 import com.example.flickrsearch.data.dto.FlickrPhotoPage
 import com.example.flickrsearch.data.dto.FlickrSearchResponse
 import com.example.flickrsearch.ui.main.MainState
+import com.example.flickrsearch.ui.main.MainViewModel
 import com.example.flickrsearch.ui.main.PhotoData
-import com.nhaarman.mockitokotlin2.withSettings
-import io.reactivex.Single
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import io.reactivex.subjects.SingleSubject
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.ClassRule
 import org.junit.Test
-import org.junit.Assert.*
-import java.lang.Exception
+import java.net.SocketTimeoutException
 
 
 class MainViewModelTest {
@@ -32,18 +30,8 @@ class MainViewModelTest {
         @JvmField
         @ClassRule
         val mvrxTestRule = MvRxTestRule()
-    }
 
-    private val repository: Repository = mock()
-
-    private lateinit var viewModel: MainViewModel
-
-    private lateinit var mockResponse: FlickrSearchResponse
-
-    @Before
-    fun setup() {
-
-        mockResponse = FlickrSearchResponse(
+        private val mockResponse: FlickrSearchResponse = FlickrSearchResponse(
             photos = FlickrPhotoPage(
                 page = 0,
                 photo = listOf(
@@ -61,7 +49,31 @@ class MainViewModelTest {
             ),
             stat = "ok"
         )
+
+        private val mockNewResponse = FlickrSearchResponse(
+            photos = FlickrPhotoPage(
+                page = 1,
+                photo = listOf(
+                    FlickrPhoto(
+                        id = "id2",
+                        owner = "owner2",
+                        secret = "secret2",
+                        server = "server2",
+                        farm = -1,
+                        title = "title2",
+                        url = "url2"
+                    )
+                ),
+                perpage = 20
+            ),
+            stat = "ok"
+        )
     }
+
+    private var repository: Repository = mock()
+
+    private lateinit var viewModel: MainViewModel
+
 
     @Test
     fun fetchNextPage_init_success() {
@@ -72,6 +84,8 @@ class MainViewModelTest {
 
         // given the viewmodel with default state
         viewModel = MainViewModel(MainState(currentKeyword = "test"), repository)
+
+        viewModel.fetchNextPage()
 
         // verify that tasks were requested from the repository
         verify(repository).search("test", 0)
@@ -93,13 +107,19 @@ class MainViewModelTest {
 
     @Test
     fun fetchNextPage_failed() {
-        whenever(repository.search("test", 0)).thenReturn(Single.error(Exception("Socket Timeout")))
+
+        val errorSubject = SingleSubject.create<FlickrSearchResponse>()
+        whenever(repository.search("test", 0)).thenReturn(errorSubject)
 
         // given the viewmodel with default state
         viewModel = MainViewModel(MainState(currentKeyword = "test"), repository)
 
+        viewModel.fetchNextPage()
+
         // verify that search was requested from data source
         verify(repository).search("test", 0)
+
+        errorSubject.onError(SocketTimeoutException("Socket Time Out Exception"))
 
         // verify that search request failed and data is empty
         withState(viewModel) {
@@ -124,6 +144,8 @@ class MainViewModelTest {
             repository
         )
 
+        viewModel.fetchNextPage()
+
         withState(viewModel) { assertTrue(it.request is Loading) }
 
         photoSubject.onSuccess(mockResponse)
@@ -132,7 +154,49 @@ class MainViewModelTest {
             assertTrue(it.request is Success)
             assertTrue(it.photos.size == 2)
         }
+    }
 
+
+    //TODO 테스트코드 고쳐야됨
+    /**
+     *  키워드 클릭시 데이터 로드 테스트코드
+     */
+    @Test
+    fun updateCurrentKeyword() {
+
+        val photoSubject = SingleSubject.create<FlickrSearchResponse>()
+        whenever(repository.search("test", 1)).thenReturn(photoSubject)
+
+        viewModel = MainViewModel(
+            MainState(currentKeyword = "current",
+                photos = listOf(
+                    PhotoData(title = "title", url = "url")
+                ),
+                request = Success(mockResponse)
+            ),
+            repository
+        )
+
+        viewModel.updateCurrentKeyword("nextKeyword")
+
+        withState(viewModel) {
+            assertEquals(it.currentKeyword, "nextKeyword")
+        }
+
+        viewModel.fetchNextPage()
+
+        withState(viewModel) {
+            assertEquals(it.currentKeyword, "nextKeyword")
+            assertTrue(it.request is Loading)
+        }
+
+        photoSubject.onSuccess(mockNewResponse)
+
+        withState(viewModel) {
+            assertTrue(it.photos.size == 1)
+
+            assertEquals(it.request(), mockNewResponse)
+        }
     }
 
 }

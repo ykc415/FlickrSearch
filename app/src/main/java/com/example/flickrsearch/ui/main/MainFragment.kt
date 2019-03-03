@@ -27,6 +27,14 @@ class MainFragment : BaseFragment() {
      */
     private val viewModel: MainViewModel by fragmentViewModel()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (savedInstanceState == null) {
+            viewModel.fetchNextPage()
+        }
+
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {

@@ -1,5 +1,6 @@
 package com.example.flickrsearch.ui.main
 
+import android.util.Log
 import com.airbnb.mvrx.*
 import com.example.flickrsearch.data.Repository
 import com.example.flickrsearch.data.dto.FlickrSearchResponse
@@ -35,6 +36,8 @@ class MainViewModel(
 
 ) : MvRxViewModel<MainState>(initialState) {
 
+    val TAG = this::class.java.simpleName
+
     /**
      * If you implement MvRxViewModelFactory in your companion object, MvRx will use that to create
      * your ViewModel. You can use this to achieve constructor dependency injection with MvRx.
@@ -51,10 +54,6 @@ class MainViewModel(
         }
     }
 
-    init {
-        fetchNextPage()
-    }
-
     fun fetchNextPage() = withState { state ->
         if (state.request is Loading) return@withState
 
@@ -62,6 +61,7 @@ class MainViewModel(
             .search(keyword = state.currentKeyword, page = if (state.photos.isEmpty()) 0 else state.photos.size / PHOTO_COUNT + 1)
             .subscribeOn(Schedulers.io())
             .execute {
+
                 copy(request = it,
                      photos  = photos + (it()?.photos?.photo?.map { rawData ->
                         PhotoData(
@@ -76,6 +76,7 @@ class MainViewModel(
         setState {
             MainState(currentKeyword = keyword)
         }
+
     }
 
 
