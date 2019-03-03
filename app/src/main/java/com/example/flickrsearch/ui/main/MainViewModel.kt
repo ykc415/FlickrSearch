@@ -46,6 +46,7 @@ class MainViewModel(
 
         override fun create(viewModelContext: ViewModelContext, state: MainState): MainViewModel {
             val service: Repository by viewModelContext.activity.inject()
+
             return MainViewModel(state, service)
         }
     }
@@ -73,7 +74,7 @@ class MainViewModel(
 
     fun updateCurrentKeyword(keyword: String) {
         setState {
-            copy(currentKeyword = keyword)
+            MainState(currentKeyword = keyword)
         }
     }
 
