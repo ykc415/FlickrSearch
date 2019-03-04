@@ -6,6 +6,8 @@ import com.example.flickrsearch.data.Repository
 import com.example.flickrsearch.data.dto.FlickrSearchResponse
 import com.example.flickrsearch.ui.base.MvRxViewModel
 import com.example.flickrsearch.utils.FlickrUrlParser
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import org.koin.android.ext.android.inject
 
@@ -57,13 +59,11 @@ class MainViewModel(
     fun fetchNextPage() = withState { state ->
         if (state.request is Loading) return@withState
 
-        repository
-            .search(keyword = state.currentKeyword, page = if (state.photos.isEmpty()) 0 else state.photos.size / PHOTO_COUNT + 1)
-            .subscribeOn(Schedulers.io())
+        repository.search(keyword = state.currentKeyword, page = if (state.photos.isEmpty()) 0 else state.photos.size / PHOTO_COUNT + 1)
             .execute {
-
                 copy(request = it,
-                     photos  = photos + (it()?.photos?.photo?.map { rawData ->
+                     photos  = photos
+                             + (it()?.photos?.photo?.map { rawData ->
                         PhotoData(
                              title = rawData.title,
                              url   = FlickrUrlParser.parse(rawData)
@@ -76,9 +76,7 @@ class MainViewModel(
         setState {
             MainState(currentKeyword = keyword)
         }
-
     }
 
-
-
 }
+

@@ -157,7 +157,6 @@ class MainViewModelTest {
     }
 
 
-    //TODO 테스트코드 고쳐야됨
     /**
      *  키워드 클릭시 데이터 로드 테스트코드
      */
@@ -168,7 +167,7 @@ class MainViewModelTest {
         whenever(repository.search("test", 1)).thenReturn(photoSubject)
 
         viewModel = MainViewModel(
-            MainState(currentKeyword = "current",
+            MainState(currentKeyword = "test",
                 photos = listOf(
                     PhotoData(title = "title", url = "url")
                 ),
@@ -182,6 +181,8 @@ class MainViewModelTest {
         withState(viewModel) {
             assertEquals(it.currentKeyword, "nextKeyword")
         }
+
+        whenever(repository.search("nextKeyword", 0)).thenReturn(photoSubject)
 
         viewModel.fetchNextPage()
 
