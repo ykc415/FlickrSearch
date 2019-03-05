@@ -19,6 +19,7 @@ data class PhotoData(
 )
 
 data class MainState(
+    @PersistState
     val currentKeyword: String = "Apple",
 
     /** We use this request to store the list of all photos. */
@@ -76,6 +77,8 @@ class MainViewModel(
         setState {
             MainState(currentKeyword = keyword)
         }
+
+        fetchNextPage()
     }
 
 }

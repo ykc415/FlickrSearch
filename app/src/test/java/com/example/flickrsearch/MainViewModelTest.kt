@@ -176,15 +176,15 @@ class MainViewModelTest {
             repository
         )
 
+        whenever(repository.search("nextKeyword", 0)).thenReturn(photoSubject)
+
         viewModel.updateCurrentKeyword("nextKeyword")
 
         withState(viewModel) {
             assertEquals(it.currentKeyword, "nextKeyword")
         }
 
-        whenever(repository.search("nextKeyword", 0)).thenReturn(photoSubject)
 
-        viewModel.fetchNextPage()
 
         withState(viewModel) {
             assertEquals(it.currentKeyword, "nextKeyword")

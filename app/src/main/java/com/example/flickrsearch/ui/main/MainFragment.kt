@@ -81,7 +81,6 @@ class MainFragment : BaseFragment() {
                         .buttonText(it)
                         .clickListener { _ ->
                             viewModel.updateCurrentKeyword(it)
-                            viewModel.fetchNextPage()
                         }
                 }
             }
