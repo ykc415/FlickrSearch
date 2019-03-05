@@ -1,14 +1,10 @@
 package com.example.flickrsearch.ui.main
 
-import android.util.Log
 import com.airbnb.mvrx.*
 import com.example.flickrsearch.data.Repository
 import com.example.flickrsearch.data.dto.FlickrSearchResponse
 import com.example.flickrsearch.ui.base.MvRxViewModel
 import com.example.flickrsearch.utils.FlickrUrlParser
-import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import org.koin.android.ext.android.inject
 
 const val PHOTO_COUNT = 20
@@ -19,6 +15,8 @@ data class PhotoData(
 )
 
 data class MainState(
+
+    /** @PersistState  parcels data into a bundle that can besaved with savedInstanceState.**/
     @PersistState
     val currentKeyword: String = "Apple",
 
