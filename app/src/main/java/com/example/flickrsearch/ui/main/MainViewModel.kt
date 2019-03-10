@@ -6,6 +6,7 @@ import com.example.flickrsearch.data.dto.FlickrSearchResponse
 import com.example.flickrsearch.ui.base.MvRxViewModel
 import com.example.flickrsearch.utils.FlickrUrlParser
 import org.koin.android.ext.android.inject
+import timber.log.Timber
 
 const val PHOTO_COUNT = 20
 
@@ -37,7 +38,10 @@ class MainViewModel(
 
 ) : MvRxViewModel<MainState>(initialState) {
 
-    val TAG = this::class.java.simpleName
+
+    init {
+        Timber.e("Created ${this}")
+    }
 
     /**
      * If you implement MvRxViewModelFactory in your companion object, MvRx will use that to create
@@ -79,5 +83,9 @@ class MainViewModel(
         fetchNextPage()
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        Timber.e("onCleared")
+    }
 }
 
