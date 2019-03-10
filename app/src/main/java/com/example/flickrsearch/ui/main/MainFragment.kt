@@ -23,11 +23,6 @@ class MainFragment : BaseFragment() {
         val LIST_STATE_KEY = "liststate"
     }
 
-    init {
-        /** 테스트용 **/
-//        retainInstance = true
-    }
-
     val TAG = this::class.simpleName
 
     /**
@@ -42,11 +37,6 @@ class MainFragment : BaseFragment() {
 
         Timber.e("onCreate")
 
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putParcelable(LIST_STATE_KEY, recyclerView.layoutManager?.onSaveInstanceState())
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -73,12 +63,6 @@ class MainFragment : BaseFragment() {
 
         recyclerView.setController(epoxyController)
 
-        if(savedInstanceState != null) {
-            val listState = savedInstanceState.getParcelable<Parcelable>(LIST_STATE_KEY)
-            recyclerView.post {
-                recyclerView.layoutManager!!.onRestoreInstanceState(listState)
-            }
-        }
     }
 
     override fun onDestroy() {
