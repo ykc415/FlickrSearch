@@ -1,7 +1,7 @@
 package com.example.flickrsearch.ui.main
 
 import android.os.Bundle
-import android.util.Log
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,9 +14,19 @@ import com.example.flickrsearch.ui.main.views.MyButtonModel_
 import com.example.flickrsearch.ui.main.views.myPhoto
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_main.*
+import timber.log.Timber
 
 
 class MainFragment : BaseFragment() {
+
+    companion object {
+        val LIST_STATE_KEY = "liststate"
+    }
+
+    init {
+        /** 테스트용 **/
+//        retainInstance = true
+    }
 
     val TAG = this::class.simpleName
 
@@ -30,10 +40,13 @@ class MainFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (savedInstanceState == null) {
-            viewModel.fetchNextPage()
-        }
+        Timber.e("onCreate")
 
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable(LIST_STATE_KEY, recyclerView.layoutManager?.onSaveInstanceState())
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -49,7 +62,7 @@ class MainFragment : BaseFragment() {
         viewModel.asyncSubscribe(MainState::request, onFail = { error ->
             Snackbar.make(view, "Jokes request failed.", Snackbar.LENGTH_INDEFINITE)
                 .show()
-            Log.w(TAG, "Jokes request failed", error)
+            Timber.w(TAG, "Jokes request failed", error)
         })
 
         return view
@@ -59,6 +72,18 @@ class MainFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         recyclerView.setController(epoxyController)
+
+        if(savedInstanceState != null) {
+            val listState = savedInstanceState.getParcelable<Parcelable>(LIST_STATE_KEY)
+            recyclerView.post {
+                recyclerView.layoutManager!!.onRestoreInstanceState(listState)
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Timber.e("onDestroy")
     }
 
     override fun invalidate() {
