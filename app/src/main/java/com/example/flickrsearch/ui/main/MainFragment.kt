@@ -1,10 +1,10 @@
 package com.example.flickrsearch.ui.main
 
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.mvrx.fragmentViewModel
 import com.example.flickrsearch.R
 import com.example.flickrsearch.ui.base.*
@@ -13,7 +13,7 @@ import com.example.flickrsearch.ui.base.views.marquee
 import com.example.flickrsearch.ui.main.views.MyButtonModel_
 import com.example.flickrsearch.ui.main.views.myPhoto
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.fragment_main.*
+import kotlinx.android.synthetic.main.fragment_base_mvrx.*
 import timber.log.Timber
 
 
@@ -63,6 +63,20 @@ class MainFragment : BaseFragment() {
 
         recyclerView.setController(epoxyController)
 
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 0 && fab.visibility == View.VISIBLE) {
+                    fab.hide()
+                } else if (dy < 0 && fab.visibility != View.VISIBLE) {
+                    fab.show()
+                }
+            }
+        })
+
+        fab.setOnClickListener {
+            recyclerView.smoothScrollToPosition(0)
+        }
     }
 
     override fun onDestroy() {
