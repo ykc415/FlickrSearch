@@ -25,6 +25,8 @@ class MainFragment : BaseFragment() {
 
     val TAG = this::class.simpleName
 
+    override val mvrxViewId: String = "main"
+
     /**
      * This will get or create a new ViewModel scoped to this Fragment. It will also automatically
      * subscribe to all state changes and call [invalidate] which we have wired up to
